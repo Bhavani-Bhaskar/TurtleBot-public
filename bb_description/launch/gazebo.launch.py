@@ -1,5 +1,6 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
@@ -22,6 +23,32 @@ def generate_launch_description():
             'bb.urdf.xacro'
         ])
     ])
+
+    # Spawn robot node
+    spawn_robot = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-name', 'bumperbot',
+            '-topic', '/robot_description'
+        ],
+        output='screen'
+    )
+
+    # Load controller manager spawner after robot is spawned
+    load_joint_state_broadcaster = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster'],
+        output='screen'
+    )
+
+    load_velocity_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['simple_velocity_controller'],
+        output='screen'
+    )
 
     return LaunchDescription([
 
@@ -58,22 +85,39 @@ def generate_launch_description():
         ),
 
         # Spawn Robot in Gazebo
-        Node(
-            package='ros_gz_sim',
-            executable='create',
-            arguments=[
-                '-name', 'bumperbot',
-                '-topic', '/robot_description'
-            ],
-            output='screen'
-        ),
+        spawn_robot,
 
-        # Bridge Gazebo clock to ROS 2 (fixes "No clock received" warnings)
+        # Bridge Gazebo clock to ROS 2
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
             arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
             output='screen'
+        ),
+
+        # Bridge joint states from Gazebo to ROS 2
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            arguments=['/world/empty/model/bumperbot/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model'],
+            remappings=[('/world/empty/model/bumperbot/joint_state', '/joint_states')],
+            output='screen'
+        ),
+
+        # Load joint state broadcaster after robot spawns
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawn_robot,
+                on_exit=[load_joint_state_broadcaster],
+            )
+        ),
+
+        # Load velocity controller after joint state broadcaster
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_broadcaster,
+                on_exit=[load_velocity_controller],
+            )
         ),
 
     ])
