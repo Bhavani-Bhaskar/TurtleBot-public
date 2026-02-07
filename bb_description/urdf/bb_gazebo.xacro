@@ -44,6 +44,13 @@
       <maxVel>0.1</maxVel>
     </gazebo>
 
+    <!-- Gazebo Sensors System Plugin - Required for sensors to work -->
+    <gazebo>
+      <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+      </plugin>
+    </gazebo>
+
     <!-- ROS 2 Control (Gazebo Harmonic) -->
     <!-- <gazebo>
       <plugin
@@ -76,6 +83,36 @@
         <robot_base_frame>base_footprint</robot_base_frame>
         <odom_publish_frequency>50</odom_publish_frequency>
       </plugin>
+    </gazebo>
+
+    <!-- LIDAR Sensor - Gazebo Harmonic (Native Sensors, bridged via ros_gz_bridge) -->
+    <gazebo reference="lidar_link">
+      <sensor name="laser" type="gpu_lidar">
+        <topic>scan</topic>
+        <update_rate>10</update_rate>
+        <visualize>true</visualize>
+        <frame_id>lidar_link</frame_id> 
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.3</min>
+            <max>12.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+      </sensor>
     </gazebo>
 
   </xacro:macro>

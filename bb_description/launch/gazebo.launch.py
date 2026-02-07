@@ -105,5 +105,23 @@ def generate_launch_description():
 
         # NOTE: Controllers are NOT loaded here
         # Use controller.launch.py to load them manually after this launch file
-
+        # Bridge laser scan from Gazebo to ROS
+        # Bridge laser scan with frame_id remapping
+        # Bridge laser scan
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            arguments=[
+                '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'
+            ],
+            output='screen'
+        ),
+        
+        # Static transform to match Gazebo's frame name
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            arguments=['0', '0', '0', '0', '0', '0', 'lidar_link', 'bumperbot/base_footprint/laser'],
+            output='screen'
+        ),
     ])
