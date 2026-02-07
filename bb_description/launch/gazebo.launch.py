@@ -14,13 +14,6 @@ def generate_launch_description():
     bb_pkg = FindPackageShare('bb_description')
     gz_pkg = FindPackageShare('ros_gz_sim')
 
-    # 🔑 Controller YAML (THIS WAS MISSING)
-    controllers_yaml = PathJoinSubstitution([
-        FindPackageShare('bb_controller'),
-        'config',
-        'bb_controllers.yaml'
-    ])
-
     robot_description = Command([
         'xacro ',
         PathJoinSubstitution([
@@ -59,27 +52,13 @@ def generate_launch_description():
                 {
                     'robot_description': robot_description,
                     'use_sim_time': use_sim_time
-                },
-                controllers_yaml   # 🔑 THIS CREATES controller_manager
+                }
             ],
             output='screen'
         ),
-#     Node(
-#     package='ros_gz_sim',
-#     executable='create',
-#     arguments=[
-#         '-name', 'bumperbot',
-#         '-file',
-#         PathJoinSubstitution([
-#             FindPackageShare('bb_description'),
-#             'urdf',
-#             'bb.urdf.xacro'
-#         ])
-#     ],
-#     output='screen'
-#  )
 
-    Node(
+        # Spawn Robot in Gazebo
+        Node(
             package='ros_gz_sim',
             executable='create',
             arguments=[
@@ -87,6 +66,14 @@ def generate_launch_description():
                 '-topic', '/robot_description'
             ],
             output='screen'
-        )
+        ),
+
+        # Bridge Gazebo clock to ROS 2 (fixes "No clock received" warnings)
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+            output='screen'
+        ),
 
     ])

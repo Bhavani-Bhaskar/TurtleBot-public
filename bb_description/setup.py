@@ -24,6 +24,9 @@ setup(
         # Launch files
         (os.path.join('share', package_name, 'launch'),
             glob('launch/*')),
+        # scripts files
+        (os.path.join('share', package_name, 'scripts'),
+            glob('scripts/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

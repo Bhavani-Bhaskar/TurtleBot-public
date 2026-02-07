@@ -152,7 +152,7 @@
     <inertial>
       <origin xyz="3.8996812895542E-07 2.40073004698083E-07 0.00219173397061509" rpy="0 0 0" />
       <mass value="1.44379265037902E-06" />
-      <inertia ixx="7.23075276010246E-11" ixy="-6.10956872363424E-16" ixz="2.22849693527207E-15"
+      <inertia ixx="7.23075276010246E-11" ixy="-6.10956872363424E-16" ixz="2.22849693525031E-15"
                iyy="3.87137930859167E-11" iyz="2.939098587861E-15"
                izz="1.00967486676306E-10" />
     </inertial>
@@ -190,6 +190,9 @@
       <geometry>
         <mesh filename="package://bb_description/meshes/imu_link.STL" />
       </geometry>
+      <material name="imu_blue">
+        <color rgba="0.2 0.4 0.8 1.0"/>
+      </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
@@ -203,6 +206,39 @@
     <origin xyz="0 0 0.0698986241758014" rpy="3.14159265358979 0 0" />
     <parent link="base_link" />
     <child link="imu_link" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+  <!-- LIDAR Link and Joint -->
+  <link name="lidar_link">
+    <inertial>
+      <origin xyz="-0.0001282412 0.0054365480 0.0157879479" rpy="0 0 0"/>
+      <mass value="0.1700000000"/>
+      <inertia ixx="1.3580113591e-04" ixy="3.5050643277e-08" ixz="-3.2031016417e-07"
+               iyy="1.4486144937e-04" iyz="-1.3760036381e-05"
+               izz="2.2843409170e-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.022" length="0.026"/>
+      </geometry>
+      <material name="lidar_blue">
+        <color rgba="0.2 0.4 0.8 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.022" length="0.026"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <origin xyz="0 0 0.084" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="lidar_link" />
     <axis xyz="0 0 0" />
   </joint>
 
