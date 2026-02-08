@@ -31,6 +31,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'simple_controller = bb_controller.simple_controller:main',
+            'teleop_keyb = bb_controller.teleop_keyb:main',
         ],
     },
 )
