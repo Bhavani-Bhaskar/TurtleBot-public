@@ -1,0 +1,22 @@
+ros2 launch bb_description gazebo.launch.py
+ros2 launch bb_controller controller.launch.py
+ros2 topic pub /simple_velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [0.0, 0.0]" --once
+
+simple controller(inv kin)
+ros2 launch bb_description gazebo.launch.py
+ros2 launch bb_controller simplecontroller\(invkin\).launch.py
+ros2 topic pub /bumperbot_controller/cmd_vel geometry_msgs/msg/TwistStamped "
+twist:
+  linear:
+    x: 0.1
+    y: 0.0
+    z: 0.0
+  angular:
+    x: 0.0
+    y: 0.0
+    z: 0.0"
+
+
+ros2 launch bb_description gazebo.launch.py
+ros2 launch bb_controller teleop_keyb.launch.py
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/bumperbot_controller/cmd_vel

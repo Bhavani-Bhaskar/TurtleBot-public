@@ -1,34 +1,14 @@
 import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import TimerAction
 
 
 def generate_launch_description():
 
-    # Spawn joint_state_broadcaster
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "joint_state_broadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-    )
-
-    # Spawn simple_velocity_controller
-    simple_velocity_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "simple_velocity_controller",
-            "--controller-manager",
-            "/controller_manager"
-        ]
-    )
-
-    # Run the simple_controller node
-    simple_controller_node = Node(
+    # Run the teleop_keyb node
+    # This node will use the controllers already spawned by controller.launch.py
+    teleop_keyb_node = Node(
         package="bb_controller",
         executable="teleop_keyb",
         name="teleop_keyb_controller",
@@ -39,10 +19,14 @@ def generate_launch_description():
         ]
     )
 
+    # Add a small delay to ensure controllers are fully initialized
+    delayed_teleop_keyb = TimerAction(
+        period=2.0,
+        actions=[teleop_keyb_node]
+    )
+
     return LaunchDescription(
         [
-            joint_state_broadcaster_spawner,
-            simple_velocity_controller_spawner,
-            simple_controller_node,
+            delayed_teleop_keyb,
         ]
     )

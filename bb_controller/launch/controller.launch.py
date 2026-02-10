@@ -24,9 +24,23 @@ def generate_launch_description():
         ]
     )
 
+    imu_sensor_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "imu_sensor_broadcaster",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        remappings=[
+            ('/imu_sensor_broadcaster/imu', '/imu/data'),
+        ],
+    )
+
     return LaunchDescription(
         [
             joint_state_broadcaster_spawner,
             simple_controller,
+            imu_sensor_broadcaster_spawner,
         ]
     )
