@@ -1,10 +1,10 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import PathJoinSubstitution
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -14,23 +14,32 @@ def generate_launch_description():
     bb_pkg = FindPackageShare('bb_description')
     gz_pkg = FindPackageShare('ros_gz_sim')
 
-    robot_description = Command([
-        'xacro ',
-        PathJoinSubstitution([
-            bb_pkg,
-            'urdf',
-            'bb.urdf.xacro'
-        ])
-    ])
+    # Robot description (XACRO → STRING)
+    robot_description = ParameterValue(
+        Command([
+            'xacro ',
+            PathJoinSubstitution([
+                bb_pkg,
+                'urdf',
+                'bb.urdf.xacro'
+            ])
+        ]),
+        value_type=str
+    )
 
     return LaunchDescription([
 
+        # -----------------------------
+        # Launch arguments
+        # -----------------------------
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='true'
         ),
 
+        # -----------------------------
         # Launch Gazebo Harmonic
+        # -----------------------------
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 PathJoinSubstitution([
@@ -44,84 +53,100 @@ def generate_launch_description():
             }.items()
         ),
 
+        # -----------------------------
         # Robot State Publisher
+        # -----------------------------
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
-            parameters=[
-                {
-                    'robot_description': robot_description,
-                    'use_sim_time': use_sim_time
-                }
-            ],
-            output='screen'
+            output='screen',
+            parameters=[{
+                'robot_description': robot_description,
+                'use_sim_time': use_sim_time
+            }]
         ),
 
-        # Spawn Robot in Gazebo
+        # -----------------------------
+        # Spawn robot in Gazebo
+        # -----------------------------
         Node(
             package='ros_gz_sim',
             executable='create',
+            output='screen',
             arguments=[
                 '-name', 'bumperbot',
                 '-topic', '/robot_description'
+            ]
+        ),
+
+        # -----------------------------
+        # Clock bridge (REQUIRED)
+        # -----------------------------
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            output='screen',
+            arguments=[
+                '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'
+            ]
+        ),
+
+        # -----------------------------
+        # Joint states bridge
+        # -----------------------------
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            output='screen',
+            arguments=[
+                '/world/empty/model/bumperbot/joint_state'
+                '@sensor_msgs/msg/JointState[gz.msgs.Model'
             ],
-            output='screen'
+            remappings=[
+                ('/world/empty/model/bumperbot/joint_state', '/joint_states')
+            ]
         ),
 
-        # Bridge Gazebo clock to ROS 2
+        # -----------------------------
+        # Odometry bridge
+        # -----------------------------
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
-            arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
-            output='screen'
+            output='screen',
+            arguments=[
+                '/model/bumperbot/odometry'
+                '@nav_msgs/msg/Odometry[gz.msgs.Odometry'
+            ],
+            remappings=[
+                ('/model/bumperbot/odometry', '/odom')
+            ]
         ),
 
-        # Bridge joint states from Gazebo to ROS 2
+        # -----------------------------
+        # Laser scan bridge
+        # -----------------------------
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
-            arguments=['/world/empty/model/bumperbot/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model'],
-            remappings=[('/world/empty/model/bumperbot/joint_state', '/joint_states')],
-            output='screen'
-        ),
-
-        # Bridge robot pose from Gazebo to ROS 2 (for RViz to see robot movement)
-        Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            arguments=['/model/bumperbot/pose@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'],
-            remappings=[('/model/bumperbot/pose', '/tf')],
-            output='screen'
-        ),
-
-        # Bridge odometry from Gazebo
-        Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            arguments=['/model/bumperbot/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
-            remappings=[('/model/bumperbot/odometry', '/odom')],
-            output='screen'
-        ),
-
-        # NOTE: Controllers are NOT loaded here
-        # Use controller.launch.py to load them manually after this launch file
-        # Bridge laser scan from Gazebo to ROS
-        # Bridge laser scan with frame_id remapping
-        # Bridge laser scan
-        Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
+            output='screen',
             arguments=[
                 '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'
-            ],
-            output='screen'
+            ]
         ),
-        
-        # Static transform to match Gazebo's frame name
+
+        # -----------------------------
+        # Static TF (ONLY if needed)
+        # -----------------------------
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
-            arguments=['0', '0', '0', '0', '0', '0', 'lidar_link', 'bumperbot/base_footprint/laser'],
-            output='screen'
+            output='screen',
+            arguments=[
+                '0', '0', '0',
+                '0', '0', '0',
+                'base_link',
+                'lidar_link'
+            ]
         ),
     ])

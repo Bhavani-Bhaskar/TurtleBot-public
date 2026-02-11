@@ -9,9 +9,20 @@ controller_manager:
     simple_velocity_controller:
       type: velocity_controllers/JointGroupVelocityController
 
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
 
 simple_velocity_controller:
   ros__parameters:
     joints:
       - wheel_left_joint
       - wheel_right_joint
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: imu_sensor
+    frame_id: imu_link
+    # NOTE: If your ROS2 version doesn't support 'topic_name' parameter,
+    # use the remapping in controller.launch.py instead
+    # topic_name: /imu/data

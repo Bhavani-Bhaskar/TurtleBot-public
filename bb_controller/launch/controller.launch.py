@@ -24,6 +24,9 @@ def generate_launch_description():
         ]
     )
 
+    # IMU Sensor Broadcaster with corrected remapping
+    # The broadcaster publishes to /<controller_name>/imu by default
+    # We remap /imu_sensor_broadcaster/imu -> /imu/data
     imu_sensor_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -33,7 +36,9 @@ def generate_launch_description():
             "/controller_manager",
         ],
         remappings=[
-            ('/imu_sensor_broadcaster/imu', '/imu/data'),
+            # Remap from default topic to desired topic
+            # Format: ('from_topic', 'to_topic')
+            ('imu_sensor_broadcaster/imu', 'imu/data'),
         ],
     )
 

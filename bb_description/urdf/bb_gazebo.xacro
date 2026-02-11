@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot name="bumperbot" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="bumperbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <xacro:macro name="bb_gazebo">
 
@@ -51,21 +51,6 @@
       </plugin>
     </gazebo>
 
-    <!-- ROS 2 Control (Gazebo Harmonic) -->
-    <!-- <gazebo>
-      <plugin
-        filename="gz_ros2_control-system"
-        name="gz_ros2_control::GazeboSimROS2ControlPlugin"/>
-    </gazebo> -->
-
-    <!-- Native Gazebo IMU (NO ROS plugin here) -->
-    <!-- <gazebo reference="imu_link">
-      <sensor name="imu_sensor" type="imu">
-        <always_on>true</always_on>
-        <update_rate>500</update_rate>
-      </sensor>
-    </gazebo> -->
-
     <!-- ROS 2 Control -->
     <gazebo>
     <!-- ROS 2 Iron or above -->
@@ -112,6 +97,60 @@
             <stddev>0.01</stddev>
           </noise>
         </ray>
+      </sensor>
+    </gazebo>
+
+    <!-- IMU Sensor - CRITICAL: Must include the gz-sim-imu-system plugin! -->
+    <gazebo reference="imu_link">
+      <sensor name="imu_sensor" type="imu">
+        <!-- THIS IS THE KEY - The IMU system plugin processes the sensor data -->
+        <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+        </plugin>
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>true</visualize>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0003</stddev>  <!-- rad/s -->
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0003</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0003</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>  <!-- m/s^2 -->
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
       </sensor>
     </gazebo>
 
