@@ -1,0 +1,8 @@
+/tf -> base_link->wheel_left_link and base_link->wheel_right_link
+/tf_static -> base_link->lidar link
+/imu_sensor_broadcaster/imu -> imu_link
+/joint_states -> base_link->wheel_left_link and base_link->wheel_right_link
+/odom -> odom -> base_footprint
+/scan -> bumperbot/base_footprint/laser
+/clock
+some controller topics....

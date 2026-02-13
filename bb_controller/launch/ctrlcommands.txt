@@ -20,3 +20,37 @@ twist:
 ros2 launch bb_description gazebo.launch.py
 ros2 launch bb_controller teleop_keyb.launch.py
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/bumperbot_controller/cmd_vel
+
+
+
+lidar in sim:
+ros2 topic echo /scan --once
+
+
+imu in sim:
+ros2 launch bb_description gazebo.launch.py
+ros2 launch bb_controller controller.launch.py
+
+
+
+cd ~/robot_ws
+colcon build
+source install/setup.bash
+
+
+flow1:
+Terminal 1: ros2 launch bb_description gazebo.launch.py
+Terminal 2: ros2 launch bb_controller controller.launch.py
+Terminal 3: ros2 launch bb_controller simplecontroller\(invkin\).launch.py 
+   OR
+Terminal 3: ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+flow2:
+Terminal 1: ros2 launch bb_description gazebo.launch.py
+Terminal 2: ros2 launch bb_controller controller.launch.py
+Terminal 3: ros2 launch bb_controller simplecontroller(invkin).launch.py
+           OR ros2 run teleop_twist_keyboard teleop_twist_keyboard
+Terminal 4: ros2 launch bb_description rviz.launch.py
+
+flow3:
+Terminal 1: ros2 launch bb_description display.launch.py
