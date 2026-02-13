@@ -12,7 +12,7 @@ def generate_launch_description():
             name='wheel_odometry',
             output='screen',
             parameters=[{
-                'publish_tf': False,
+                'publish_tf': True,
                 'use_sim_time': True,
                 'odom_frame': 'odom',
                 'base_frame': 'base_footprint'
