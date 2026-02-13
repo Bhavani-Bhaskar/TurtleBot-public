@@ -213,10 +213,10 @@
   <link name="lidar_link">
     <inertial>
       <origin xyz="-0.0001282412 0.0054365480 0.0157879479" rpy="0 0 0"/>
-      <mass value="0.1700000000"/>
-      <inertia ixx="1.3580113591e-04" ixy="3.5050643277e-08" ixz="-3.2031016417e-07"
-               iyy="1.4486144937e-04" iyz="-1.3760036381e-05"
-               izz="2.2843409170e-05" />
+      <mass value="0.0600000000"/>
+      <inertia ixx="4.80e-05" ixy="1.24e-08" ixz="-1.13e-07"
+          iyy="5.11e-05" iyz="-4.86e-06" 
+          izz="8.07e-06"/>
     </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
