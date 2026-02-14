@@ -62,11 +62,17 @@
     </gazebo>
 
     <!-- Odometry Plugin - publishes robot pose for RViz -->
+    <!-- Added noise to make it more realistic (not perfect ground truth) -->
     <gazebo>
       <plugin filename="libgz-sim-odometry-publisher-system.so" name="gz::sim::systems::OdometryPublisher">
         <odom_frame>odom</odom_frame>
         <robot_base_frame>base_footprint</robot_base_frame>
         <odom_publish_frequency>50</odom_publish_frequency>
+        <!-- Add Gaussian noise to position estimates -->
+        <xyz_offset>0 0 0</xyz_offset>
+        <rpy_offset>0 0 0</rpy_offset>
+        <!-- Gaussian noise parameters for position (in meters) -->
+        <gaussian_noise>0.01</gaussian_noise>
       </plugin>
     </gazebo>
 

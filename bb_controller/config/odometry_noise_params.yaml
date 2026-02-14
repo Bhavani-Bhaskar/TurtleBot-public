@@ -1,0 +1,81 @@
+/**:
+  ros__parameters:
+    # ==========================================
+    # WHEEL ODOMETRY NOISE PARAMETERS
+    # ==========================================
+    # These parameters control how realistic the odometry is
+    
+    # Enable/Disable Features
+    enable_motion_noise: true      # Add noise to motion model (recommended: true)
+    enable_covariance: true        # Publish covariance matrices (recommended: true)
+    
+    # ==========================================
+    # Motion Model Noise (Alpha Parameters)
+    # ==========================================
+    # Based on "Probabilistic Robotics" by Thrun, Burgard, Fox
+    # These represent how much uncertainty accumulates with motion
+    
+    # alpha1: Rotation affects rotation uncertainty (rad²/rad)
+    # Higher value = more drift in heading during turns
+    # Typical range: 0.01 - 0.1
+    alpha1: 0.05
+    
+    # alpha2: Translation affects rotation uncertainty (rad²/m)
+    # Higher value = heading drifts more during straight motion
+    # Typical range: 0.001 - 0.01
+    alpha2: 0.005
+    
+    # alpha3: Translation affects translation uncertainty (m²/m)
+    # Higher value = more position drift during motion
+    # Typical range: 0.01 - 0.1
+    alpha3: 0.05
+    
+    # alpha4: Rotation affects translation uncertainty (m²/rad)
+    # Higher value = position drifts during turns
+    # Typical range: 0.001 - 0.01
+    alpha4: 0.005
+    
+    # ==========================================
+    # Base Covariance Values
+    # ==========================================
+    # Initial/minimum uncertainty estimates
+    
+    # Position uncertainty (x, y) in m²
+    # Typical: 0.0001 - 0.01
+    base_position_covariance: 0.001
+    
+    # Orientation uncertainty (theta) in rad²
+    # Typical: 0.0001 - 0.01
+    base_orientation_covariance: 0.001
+    
+    # Velocity uncertainty (vx, wz) in (m/s)² and (rad/s)²
+    # Typical: 0.001 - 0.1
+    base_velocity_covariance: 0.01
+    
+    # ==========================================
+    # TUNING GUIDELINES
+    # ==========================================
+    # 
+    # For SMOOTH FLOORS (tiles, concrete):
+    #   - Lower alpha values (alpha1=0.02, alpha3=0.02)
+    #   - Less wheel slip, more predictable motion
+    #
+    # For ROUGH SURFACES (carpet, outdoor):
+    #   - Higher alpha values (alpha1=0.1, alpha3=0.1)
+    #   - More wheel slip and unpredictable motion
+    #
+    # For HIGH-PRECISION LOCALIZATION (small environment):
+    #   - Lower base covariance values (0.0001 - 0.001)
+    #   - Tells localization to trust odometry more
+    #
+    # For LARGE-SCALE MAPPING (big environment):
+    #   - Higher base covariance values (0.01 - 0.1)
+    #   - Tells localization odometry drifts significantly
+    #
+    # TESTING YOUR VALUES:
+    #   1. Drive robot in a square (4 x 90° turns)
+    #   2. Measure final position error
+    #   3. Increase alpha values if error is underestimated
+    #   4. Decrease if particle filter diverges or ignores sensors
+    #
+    # ==========================================

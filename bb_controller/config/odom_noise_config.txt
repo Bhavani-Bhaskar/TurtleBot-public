@@ -1,0 +1,17 @@
+For AMCL (Particle Filter):
+yaml# Your AMCL config should match these values:
+odom_alpha1: 0.05   # rotation → rotation
+odom_alpha2: 0.005  # translation → rotation
+odom_alpha3: 0.05   # translation → translation
+odom_alpha4: 0.005  # rotation → translation
+Now when you run AMCL:
+
+✅ Particles will spread correctly
+✅ Localization will work properly
+✅ No more particle collapse!
+
+For robot_localization (EKF):
+
+✅ No configuration changes needed
+✅ EKF automatically reads covariance from your /odom topic
+✅ Will properly weight odometry vs IMU/sensors

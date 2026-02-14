@@ -54,3 +54,6 @@ Terminal 4: ros2 launch bb_description rviz.launch.py
 
 flow3:
 Terminal 1: ros2 launch bb_description display.launch.py
+
+broadcast odometry transforms
+ros2 launch bb_controller odometry.launch.py
